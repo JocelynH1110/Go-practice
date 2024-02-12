@@ -8,7 +8,6 @@ import (
 	"log"
 	"math/rand"
 	"strconv"
-	"time"
 )
 
 var helloList = []string{
@@ -19,7 +18,6 @@ var helloList = []string{
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
 	index := rand.Intn(len(helloList))
 	msg, err := hello(index)
 	if err != nil {
