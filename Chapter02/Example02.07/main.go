@@ -1,3 +1,4 @@
+// 2-4-2  for i 迴圈
 package main
 
 import "fmt"
