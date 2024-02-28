@@ -19,9 +19,54 @@ bool的值只有 true 和 false 兩種，其零值為 false 。
 
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"unicode"
+)
+
+/*
+	func main() {
+		fmt.Println(10 > 5)
+		fmt.Println(10 == 5)
+	}
+*/
+func passwordChecker(pw string) bool {
+	pwR := []rune(pw)
+	if len(pwR) < 8 {
+		return false
+	}
+	hasUpper := false
+	hasLower := false
+	hasNumber := false
+	hasSymbol := false
+
+	for _, v := range pwR {
+		if unicode.IsUpper(v) {
+			hasUpper = true
+		}
+		if unicode.IsLower(v) {
+			hasLower = true
+		}
+		if unicode.IsNumber(v) {
+			hasNumber = true
+		}
+		if unicode.IsPunct(v) || unicode.IsSymbol(v) {
+			hasSymbol = true
+		}
+	}
+	return hasUpper && hasLower && hasNumber && hasSymbol
+}
 
 func main() {
-	fmt.Println(10 > 5)
-	fmt.Println(10 == 5)
+	if passwordChecker("") {
+		fmt.Println("密碼格式良好！！")
+	} else {
+		fmt.Println("密碼格式不正確！！")
+	}
+
+	if passwordChecker("This!I5A") {
+		fmt.Println("密碼格式良好")
+	} else {
+		fmt.Println("密碼格式不正確")
+	}
 }
