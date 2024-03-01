@@ -22,3 +22,11 @@ func main() {
 	fmt.Println("Int	:", intA)
 	fmt.Println("Big Int :", bigA.String())
 }
+
+// 3-3-5 位元組（byte）
+/*
+Go 語言裡的 byte 其實就是 uint8 的別名，uint8 是以 8 個位元儲存的正整數。
+每一個位元（bit）代表一個二進位值，亦即開或關（1 或 0）。
+電腦運算從很早期就開始採用以 8 個位元一組的「位元組」編碼。
+8 個位元總共有 256 種可能的開關組合。uint8 0~255 ，故256種。
+*/
