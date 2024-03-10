@@ -39,7 +39,28 @@ func getPassedArg(minArgs int) []string {
 		fmt.Printf("至少需要輸入 %v 個參數\n", minArgs)
 		os.Exit(1) //強制結束程式
 	}
+	var args []string //建立空白切片
+
+	for i := 1; i < len(os.Args); i++ { //因為要去掉第一個參數（程式名稱），所以迴圈從 1 開始
+		args = append(args, os.Args[i])
+	}
+	return args
+}
+func findLongest(args []string) string {
+	var longest string
+	for i := 0; i < len(args); i++ {
+		if len(args[i]) > len(longest) {
+			longest = args[i]
+		}
+	}
+	return longest
 }
 func main() {
+	if longest := findLongest(getPassedArg(4)); len(longest) > 0 {
+		fmt.Println("傳入的最長單字", longest)
+	} else {
+		fmt.Println("發生錯誤")
+		os.Exit(1)
+	}
 
 }
