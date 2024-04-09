@@ -50,9 +50,11 @@ package main
 import "fmt"
 
 func main() {
-	//x := 9
+	x := 9
 	sqr := func(i int) int {
 		return i * i
 	}
-	fmt.Printf("%d 的平方為 %d\n", 10, sqr(10))
+	fmt.Printf("%d 的平方為 %d\n", x, sqr(x))
 }
+
+//當我們在函式中需要一個小函式、且在煮成是的其他部位可能不需要重新利用時，就可以直接建立一個匿名函式，並將其賦予給變數。
