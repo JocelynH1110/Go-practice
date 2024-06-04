@@ -23,7 +23,7 @@ OR
 4. 重整 go.mod：
 `go mod tidy`
 
-
+### 用 go mod tidy 整理/更新 go.mod
 如果 go.mod 沒有自動更新，可至主控台執行 go mod tidy 來重整。
 專案多出來一個 go.sum 檔案，是用來紀錄套件的雜湊長度（hash），以便確保下載的套件未經竄改。
 
