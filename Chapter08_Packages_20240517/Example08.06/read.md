@@ -41,8 +41,8 @@ func main(){
 ```
 
 執行結果：
-`Hallo,Gordo
-Hallo,main() 函式`
+`Hallo,Gordo`
+`Hallo,main() 函式`
 
 分析：
 套件層級的宣告變數會最先執行，name -> init() -> main()
