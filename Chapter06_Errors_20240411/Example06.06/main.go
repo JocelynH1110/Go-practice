@@ -2,6 +2,8 @@
 /*
 前面是用 errors.New() 建立 error 值。
 另一個方式是使用 fmt.Errorf() ，讓你建立格式化的錯誤訊息：
+*/
+
 func payDay(hoursWorked,hourlyRate int)(int,error){
 	if hourlyRate < 0 || hourlyRate > 75{
 		return 0, fmt.Errorf("無效的時薪： %d",hourlyRate)
@@ -12,7 +14,7 @@ func payDay(hoursWorked,hourlyRate int)(int,error){
 	}
 }
 
-這表示我們更可以把其他 error 值的內容讀出來，連同其他訊息合併成一個新的 error 值：
+// 這表示我們更可以把其他 error 值的內容讀出來，連同其他訊息合併成一個新的 error 值：
 func payDay(hoursWorked,hourlyRate int)(int,error){
 	if hourlyRate < 0 || hourlyRate > 75{
 		return 0, fmt.Errorf("payDay 錯誤： %s",ErrHourlyRate.Error())
