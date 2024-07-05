@@ -80,3 +80,30 @@ const(
 
 
 ### 使用 log.Fatal()、log.Panic() 紀錄嚴重錯誤
+* Fatal()、Fatalln()、Fatalf() 方法的作用跟 log 或 fmt 的 Print()、Println()、Printf() 相同。
+* 差別在於：Fatal() 們在輸出訊息後，接著會呼叫 os.Exit(1) 來中止程式。
+* Panic()、Panicln()、Panicf() 用法和 Fatal() 系列相同。
+* 差別在於：會引發 panic。panic 可以用 recover() 函式救回來，但 os.Exit 就不行了。 （lesson 6）
+
+當有重大錯誤發生時，可在輸出日誌追蹤資訊的同時決定是否要中止程式，該不該給使用者機會挽救。
+若錯誤可能會令應用程式的資料受損、或發生難以預期的行為，那最好的是在事態惡化前先讓程式當掉。
+若程式結束時需要做一些安全操作，如透過用 defer 延遲執行的函式來關閉檔案或資料庫，那使用 log.Panic() 會是叫好的選擇。
+
+例子、讓程式在遇到錯誤時當掉：
+```go
+func main() {
+	log.SetFlags(log.Ldate | log.Lmicroseconds | log.Llongfile)
+	log.Println("Start of our app")
+	err := errors.New("application aborted!")
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("End of our app")
+}
+```
+執行結果：
+```
+2024/07/05 13:46:39.559488 /home/jocelyn/working/Go-practice/Chapter09_BasicDebugging_20240614/Example09.04/main.go:10: Start of our app
+2024/07/05 13:46:39.559535 /home/jocelyn/working/Go-practice/Chapter09_BasicDebugging_20240614/Example09.04/main.go:13: application aborted!
+exit status 1
+```

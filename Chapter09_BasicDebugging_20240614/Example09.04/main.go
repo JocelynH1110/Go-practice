@@ -10,7 +10,7 @@ func main() {
 	log.Println("Start of our app")
 	err := errors.New("application aborted!")
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 	log.Println("End of our app")
 }
