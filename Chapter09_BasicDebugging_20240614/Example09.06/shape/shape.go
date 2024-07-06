@@ -28,7 +28,7 @@ func GetArea(shape Shape) float64 { //修改過的新函式，傳回 shape 介�
 }
 
 func (t Triangle) area() float64 {
-	return (t.Base * t.Height) / 2
+	return (t.Base * t.Height)
 }
 
 func (t Triangle) name() string {
@@ -40,7 +40,7 @@ func (r Rectangle) area() float64 {
 }
 
 func (r Rectangle) name() string {
-	return "長方形"
+	return "矩形"
 }
 
 func (s Square) area() float64 {
