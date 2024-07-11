@@ -68,3 +68,55 @@ Now: 2024-07-10 17:19:07.305848325 +0800 CST m=+0.000008826
 Date1: 2024-07-10 17:25:07.305848325 +0800 CST m=+360.000008826
 Date2: 2024-07-10 18:49:07.305848325 +0800 CST m=+5400.000008826
 ```
+
+## 10-5-3 測量時間長度
+時間長度的用途，不只能用來改變時間值。在現實中的應用程式裡，也可能會需要計算程式執行所耗費的時間。
+
+#### 若要測量某段程式執行的時間，只需該段程式的頭尾各取一次當下系統時間，然後用第二個時間值的 Sub() 方法減去第一個時間值：
+```
+func (t Time) Sub(u Time) Duration
+```
+
+#### time.Since() 與 Until()
+* 假如要用當下系統時間判斷某個時間到現在的時間長度，也可使用 time.Since(<時間值>)，這功能相當於以下寫法：
+```
+time.Now().Sub(<時間值>)
+```
+* 計算當下系統時間到未來某個時間還有多久：
+```
+time.Until(<時間值>)    // 相當於寫成 <時間值>.Sub(time.Now())
+```
+
+#### 練習、測試程式執行時間
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	start := time.Now()
+	time.Sleep(time.Second * 2)
+	end := time.Now()
+	duration1 := end.Sub(start)    // 計算兩個時間值之間的長度
+	duration2 := time.Since(start) // 計算 start 到 time.Now() 的時間長度
+
+	fmt.Println("Duration1:", duration1)
+	fmt.Println("Duration2:", duration2)
+
+	// 檢查 duration1 是否小於 2500 毫秒（2.5秒）
+	if duration1 < time.Duration(time.Millisecond*2500) {
+		fmt.Println("程式執行時間符合預期")
+	} else {
+		fmt.Println("程式執行時間超出預期")
+	}
+}
+```
+顯示結果：
+```
+Duration1: 2.00112987s
+Duration2: 2.001130293s
+程式執行時間符合預期
+```
