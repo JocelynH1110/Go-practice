@@ -160,3 +160,5 @@ main.student{StudentId:123, LastName:"Smith", MiddleInitial:"", FirstName:"John"
 
 {123 Smith  John true [{Math 301 2} {History 302 3} {English 304 2}]}
 ```
+> note、鍵 classes 下面是陣列，當中每個元素是 JSON 物件。
+> 不見得一定得將 JSON 的所有鍵與值對放進結構。假如只是需要其中一部分資料，可以只提供一部分欄位和標籤，這樣一來無法配對的鍵與值就會被丟棄。
