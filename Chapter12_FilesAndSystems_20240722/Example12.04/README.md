@@ -55,5 +55,47 @@ func main() {
 執行以上程式，同目錄下會出現 text.txt 其內容會如下：
 ```
 使用 Write() 寫入
-使用 WriteString() 寫入1
+使用 WriteString() 寫入
+```
+
+
+## 12-5-3 一次完成建立檔案及寫入
+Go 語言也允許用單一一個指令建立新檔案、並直接完成寫資料的動作。  
+
+這要用到 os 套件的 WriteFile() 函式，定義如下：
+```go
+func WriteFile(filename string, data []byte, perm os.FileMode)error
+```
+> filename（字串）：檔案名稱。如果檔案不存在就會新建一個，而已經存在的檔案則會清空其內容。
+> data []byte：要寫入的字串。
+> perm：檔案權限。如前面介紹過的 0666、0763，這會用來設定新建檔案的權限。但若檔案已存在，就不會改變原有權限。
+
+
+## 12-5-7 刪除檔案
+可以使用 os.Remove() 函式：
+```go
+func Remove(name string)error
+```
+> 在刪除成功時候傳回值為 nil 的 error。
+
+例、以下為一次完成建檔和寫入資料，及刪除檔案的例子：
+```go
+package main
+
+import "os"
+
+func main() {
+	msg := "Hello Golang!"
+	// 建立檔案並寫入資料
+	err := os.WriteFile("text.txt", []byte(msg), 0644)
+	if err != nil {
+		panic(err)
+	}
+
+    // 刪除檔案
+	rm := os.Remove("test.txt")
+	if rm != nil {
+		panic(rm)
+	}
+}
 ```
