@@ -23,3 +23,37 @@ func main() {
 	defer f.Close() // 確保在 main() 結束時關閉檔案
 }
 ```
+
+
+## 12-5-2 對檔案寫入字串
+建立空檔案很簡單，但要對它寫入資料，檔案才會有內容。  
+
+可以運用 os.File 的兩個方法：
+```go
+Write(b []byte)(n int, err error)
+WriteString(s string)(n int, err error)
+```
+> Write() 和 WriteString() 功能是一樣的。只是接收的型別不同，一個是接收 []byte 切片、另一個是接收 string。
+> 傳回值 n：代表函式對檔案寫入了 n 個位元，並會在寫入失敗時傳回非 nil 的 error，不過很多時候我們並不會接收這些值。  
+
+例、新建檔案後，對該檔案結構寫入一些字串：
+```go
+package main
+
+import "os"
+
+func main() {
+	f, err := os.Create("text.txt") // 建立文字檔
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close() // 確保在 main() 結束時關閉檔案
+	f.Write([]byte("使用 Write() 寫入\n"))
+	f.WriteString("使用 WriteString() 寫入\n")
+}
+```
+執行以上程式，同目錄下會出現 text.txt 其內容會如下：
+```
+使用 Write() 寫入
+使用 WriteString() 寫入1
+```
