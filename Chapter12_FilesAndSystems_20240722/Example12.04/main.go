@@ -1,16 +1,22 @@
 package main
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
+// 檢查檔案是否存在的自訂函式
 func main() {
-	msg := "Hello Golang!"
-	// 建立檔案並寫入資料
-	err := os.WriteFile("text.txt", []byte(msg), 0644)
+	finfo, err := os.Stat("junk.txt")
 	if err != nil {
-		panic(err)
+		if os.IsNotExist(err) {
+			//fmt.Printf("%v:檔案不存在！\n\n", finfo)
+			fmt.Println(finfo)
+		}
 	}
-	rm := os.Remove("test.txt")
-	if rm != nil {
-		panic(rm)
+	finfo, err = os.Stat("text.txt")
+	if err != nil && os.IsNotExist(err) {
+		fmt.Println("text")
 	}
+	fmt.Printf("檔名：%s\n是目錄：%t\n修改時間：%v\n權限：%v\n大小：%d\n\n", finfo.Name(), finfo.IsDir(), finfo.ModTime(), finfo.Mode(), finfo.Size())
 }

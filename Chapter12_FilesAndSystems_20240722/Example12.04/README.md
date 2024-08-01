@@ -99,3 +99,99 @@ func main() {
 	}
 }
 ```
+
+
+# 12-5-4 檢查檔案是否存在
+上面的 os.Create()、os.WriteFile() 函式在碰上已經存在的檔案時，都會將其清空。  
+Go 語言提供了檢查檔案存在與否的簡單機制。
+
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+	"os"
+)
+
+// 檢查檔案是否存在的自訂函式
+func checkFile(filename string) {
+	finfo, err := os.Stat(filename) // 取得檔案描述資訊
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) { // 若 error 中包含檔案不存在錯誤
+			fmt.Printf("%v:檔案不存在！\n\n", filename)
+			return // 退出函式
+		}
+	}
+	// 若檔案正確開啟，印出其檔案資訊
+	fmt.Printf("檔名：%s\n是目錄：%t\n修改時間：%v\n權限：%v\n大小：%d\n\n", finfo.Name(), finfo.IsDir(), finfo.ModTime(), finfo.Mode(), finfo.Size())
+}
+
+func main() {
+	checkFile("text.txt")
+	checkFile("junk.txt")
+}
+```
+結果顯示：
+```go
+檔名：text.txt
+是目錄：false
+修改時間：2024-07-30 16:46:54.376146602 +0800 CST
+權限：-rw-r--r--
+大小：13
+
+junk.txt:檔案不存在！
+```
+> os.Stat() 方法傳回的錯誤可能包含多重 error 值，我們得檢查當中是否包含 os.ErrNotExist 錯誤，是的話就代表此檔案不存在。
+> errors.Is(err, os.ErrNotExist) ：他的功能是檢查 err 是否是 os.ErrNotExist，或者說 err 否表示一個檔案或目錄不存在的錯誤。
+> Go 1.13起擴充了錯誤檢查機制，官方建議使用 errors.Is(error, <欲檢查的錯誤值>) 來取代 os.IsNotExist() 等函式。
+> Go 1.13 之前的版本中，得使用 os.IsNotExist(error) 來檢查 error 值是否包含 os.ErrNotExist 值。
+
+以下為 Go 1.13 版本：
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+)
+
+// 檢查檔案是否存在的自訂函式
+func main() {
+	finfo, err := os.Stat("junk.txt")
+	if err != nil {
+		if os.IsNotExist(err) {
+			//fmt.Printf("%v:檔案不存在！\n\n", finfo)
+			fmt.Println(finfo)
+		}
+	}
+	finfo, err = os.Stat("text.txt")
+	if err != nil && os.IsNotExist(err) {
+		fmt.Println("text")
+	}
+	fmt.Printf("檔名：%s\n是目錄：%t\n修改時間：%v\n權限：%v\n大小：%d\n\n", finfo.Name(), finfo.IsDir(), finfo.ModTime(), finfo.Mode(), finfo.Size())
+}
+```
+顯示結果：
+```go
+<nil>
+檔名：text.txt
+是目錄：false
+修改時間：2024-07-30 16:46:54.376146602 +0800 CST
+權限：-rw-r--r--
+大小：13
+```
+
+
+os.Stat() 及 os.File 結構的 Stat() 方法，會傳回一個 os.fileStat 結構，塌實做了 FileInfo 介面。  
+這介面的方法能查詢檔案的各種資訊：
+```go
+type FileInfo interface{
+    Name() string   // 檔名
+    Size() int  // 檔案大小（計算方式取決於系統）
+    Mode() FileMode // 修改權限
+    ModTime() time.Time // 修改時間
+    IsDir() bool    // 是否為目錄，相當等於呼叫 Mode().IsDir()
+    Sys() interface{}   //檔案資料來源（有可能傳回 nil
+}
+```
