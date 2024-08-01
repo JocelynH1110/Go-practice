@@ -268,3 +268,65 @@ func main() {
 	fmt.Println(string(content))
 }
 ```
+
+
+## 12-5-6 一次讀取檔案中的一行字串 
+當文字檔相當大的時候，如果像前面那樣一次讀取進所有東西就會耗掉不少記憶體。  
+此時便可考慮一次讀取檔案的一行。  
+為此我們要使用 bufio 套件，也就是帶有緩衝區（buffer）的 io 套件。  
+
+為了使用 bufio ，第一步是先將檔案結構轉換成 bufio.Reader 結構：
+```go
+func NewReader(rd io.Reader) *Reader
+func NewReaderSize(rd io.Reader, size int) *Reader
+```
+> 以上兩個函式都接收一個 io.Reader 介面型別，差異在於 NewReaderSize 有個 size 參數，這是想使用的緩衝區大小。
+> 緩衝區若設為 <= 0 的值，那就會使用預設值 4096 （這也是 NewReader() 會使用的緩衝區大小）。  
+
+不管檔案有多大，同時間讀進記憶體的就只有緩衝區能容納的字元數而已，這樣一來就能達到節省空間的目的。  
+btw Go 語言允許你指定的最大緩衝區是 64*1024（=65536）。  
+
+建立了 bufio.Reader 結構後，就能使用它新增的方法來讀取檔案。  
+最常用的叫做 ReadString()：
+```go
+func (b *Reader) ReadString(delim byte)(string, error)
+```
+> 參數 delim：表示分隔符號 delimiter，通常會設為 \n，ReadString() 讀到該字元就會停下來，將包含該字元的字串傳回。
+> 要是讀到該字元前就碰到檔案結尾，那就會傳回結尾前的內容以及 io.EOF（end of file）錯誤。  
+
+```go
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"io"
+	"os"
+)
+
+func main() {
+	file, err := os.Open("text.txt")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+	fmt.Println("檔案內容：")
+	// 建立一個 bufio.Reader 結構，緩衝區大小 10
+	reader := bufio.NewReaderSize(file, 10)
+	for {
+		// 讀取 reader 直到碰到換行符號為止（讀取一行文字）
+		line, err := reader.ReadString('\n')
+		fmt.Printf("%s\n", line)
+		if err == io.EOF { // 若已讀到檔案結尾就結束
+			break
+		}
+	}
+}
+```
+顯示結果：
+```go
+檔案內容：
+Hello Golang!
+```
+
+bufio 套件其實還有很多能讀取檔案的方式，這裡就介紹到這。

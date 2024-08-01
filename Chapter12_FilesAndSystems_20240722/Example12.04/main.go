@@ -1,23 +1,27 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"os"
 )
 
-// 檢查檔案是否存在的自訂函式
 func main() {
-	f, err := os.Open("text.txt")
+	file, err := os.Open("text.txt")
 	if err != nil {
 		panic(err)
 	}
-	defer f.Close()
-	content, err := io.ReadAll(f)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	defer file.Close()
 	fmt.Println("檔案內容：")
-	fmt.Println(string(content))
+	// 建立一個 bufio.Reader 結構，緩衝區大小 10
+	reader := bufio.NewReaderSize(file, 10)
+	for {
+		// 讀取 reader 直到碰到換行符號為止（讀取一行文字）
+		line, err := reader.ReadString('\n')
+		fmt.Printf("%s\n", line)
+		if err == io.EOF { // 若已讀到檔案結尾就結束
+			break
+		}
+	}
 }
