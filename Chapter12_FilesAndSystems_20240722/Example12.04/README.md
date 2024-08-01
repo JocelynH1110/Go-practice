@@ -101,7 +101,7 @@ func main() {
 ```
 
 
-# 12-5-4 檢查檔案是否存在
+## 12-5-4 檢查檔案是否存在
 上面的 os.Create()、os.WriteFile() 函式在碰上已經存在的檔案時，都會將其清空。  
 Go 語言提供了檢查檔案存在與否的簡單機制。
 
@@ -156,7 +156,6 @@ import (
 	"os"
 )
 
-// 檢查檔案是否存在的自訂函式
 func main() {
 	finfo, err := os.Stat("junk.txt")
 	if err != nil {
@@ -193,5 +192,79 @@ type FileInfo interface{
     ModTime() time.Time // 修改時間
     IsDir() bool    // 是否為目錄，相當等於呼叫 Mode().IsDir()
     Sys() interface{}   //檔案資料來源（有可能傳回 nil
+}
+```
+
+
+## 12-5-5 一次讀取整個檔案內容 
+在建立檔案後，自然會需要讀取它。若檔案不算太大的話，可以用本小節的兩個方式一口氣讀進所有內容。  
+但若拿來開啟過大的檔案，就會耗掉大量系統的記憶體。下節會看如何一次只讀取一行字的做法。
+### 使用 os.ReadFile()
+第一種檔案全讀的方法如下：
+```go
+func ReadFile(filename string)([]byte, error)
+```
+> os.ReadFile() 會開啟檔名參數 filename 指定的檔案並讀取其內容，成功的話會以 []byte 切片形式傳回，error 會傳回 nil。
+> os.File 結構在讀取內容時，或碰到檔案結尾會傳回 io.EOF（end of file）錯誤，但 ReadFile 是讀取整個檔案，故不會傳回 EOF。
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+)
+
+func main() {
+	content, err := os.ReadFile("text.txt")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("檔案內容：")
+	fmt.Println(string(content))
+}
+```
+顯示結果：
+```
+檔案內容：
+Hello Golang!
+
+```
+### 使用 io.ReadAll() 搭配 os.Open()
+第二種檔案全讀的方法：
+```go
+func ReadAll(r io.Reader)([]byte, error)
+```
+> 和第一種全讀功能很像，差別在於接收的參數是 io.Reader 介面型別。
+> 這表示 ReadAll() 不只可以用來讀取 os.File 檔案，也能讀取符合 io.Reader 介面的任何物件，如 strings.NewReader() 或 http.Request 等。
+
+若要讀取檔案，得先取得該檔案的 os.File 結構，辦法是使用 os.Open() 函式：
+```go
+func Open(name string)(*File, error)
+```
+
+
+```go
+package main
+
+import (
+	"fmt"
+	"io"
+	"os"
+)
+
+func main() {
+	f, err := os.Open("text.txt")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	content, err := io.ReadAll(f)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println("檔案內容：")
+	fmt.Println(string(content))
 }
 ```
