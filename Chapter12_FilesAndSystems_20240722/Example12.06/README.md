@@ -81,3 +81,76 @@ func main() {
 [Cailyn Hely 28]
 [Cayden Smith 42]
 ```
+
+
+## 12-7-2 讀取每行資料各欄位的值 
+如前所提，csv.Reader 的 Read() 方法會傳回 []string 切片。 csv 套件會以半形逗號為依據，將各欄位轉成字串切片的不同元素：索引 0 是左邊數來第一個欄位，索引 1 是第二個...。  
+所以只要事先知道 CSV 檔的欄位組成，就很容易取出想要的東西。
+|  索引 0  |  索引 1  |  索引 2  |
+| --- | --- | --- |
+| firstName | lastName | age |
+| Celina | Jones | 20 |
+
+跳過標頭的話，可以加入一個布林變數做為開關，在 for 迴圈第一次執行時選擇不印出東西。
+
+#### 例、修改上節範例，跳過標頭：
+```go
+package main
+
+import (
+	"encoding/csv"
+	"fmt"
+	"io"
+	"os"
+)
+
+const (
+	firstName = iota // CSV 欄位索引
+	lastName
+	age
+)
+
+func main() {
+	file, err := os.Open("data.csv") // 開啟 CSV 檔案
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	header := true                // 標頭開關
+	reader := csv.NewReader(file) // 取得 csv.Reader 結構
+	for {
+		record, err := reader.Read() // 從 csv.Reader 讀取一行資料
+		if err == io.EOF {           // 遇到檔案結尾錯誤，就離開迴圈
+			break
+		}
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		if header {
+			header = false
+			continue // 跳過第一行（標頭）
+		}
+		fmt.Println("--------------")
+		fmt.Println("First name:", record[firstName])
+		fmt.Println("Last name:", record[lastName])
+		fmt.Println("Age:", record[age])
+	}
+}
+```
+顯示結果：
+```go
+--------------
+First name: Celina
+Last name: Joned
+Age: 18
+--------------
+First name: Cailyn
+Last name: Hely
+Age: 28
+--------------
+First name: Cayden
+Last name: Smith
+Age: 42
+```
