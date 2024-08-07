@@ -1,0 +1,1 @@
+log:2024/08/07 13:50:40.691099 /home/jocelyn/working/Go-practice/Chapter12_FilesAndSystems_20240722/Example12.05/main.go:23: log message

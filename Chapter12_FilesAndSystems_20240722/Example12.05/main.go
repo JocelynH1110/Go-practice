@@ -1,51 +1,24 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"io"
+	"log"
 	"os"
 	"time"
 )
 
-// 自訂 error
-var ErrWorkingFileNotFound = errors.New("查無工作檔案")
-
 func main() {
-	workFileName := "note.txt"
-	backupFileName := "backup.txt"
-	err := writeBackup(workFileName, backupFileName)
+	// 建立或開啟一個日誌檔
+	// 其名稱為 log-年-月-日.txt，以當下時間為準
+	logFile, err := os.OpenFile(fmt.Sprintf("log-%v.txt", time.Now().Format("2006-01-02")), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		panic(err)
 	}
-}
+	defer logFile.Close()
 
-// 備份檔案的函式
-func writeBackup(work, backup string) error {
-	workFile, err := os.Open(work) // 開啟工作檔
-	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return ErrWorkingFileNotFound // 查無工作檔，傳回自訂 error
-		}
-		return err
-	}
-	defer workFile.Close() // 在備份結束後關閉工作檔
+	// 建立 logger，寫入對象為前面開啟的檔案
+	logger := log.New(logFile, "log:", log.Ldate|log.Lmicroseconds|log.Llongfile)
 
-	backFile, err := os.OpenFile(backup, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644) // 開啟備份檔，沒有就建立一個，資料附加到結尾
-	if err != nil {
-		return err
-	}
-	defer backFile.Close() // 在備份結束後關閉備份檔
-
-	content, err := io.ReadAll(workFile) // 讀取工作檔內容
-	if err != nil {
-		return err
-	}
-
-	// 把一行日期和工作檔內容寫入備份檔
-	backFile.WriteString(fmt.Sprintf("[%v]\n%v", time.Now().String(), string(content)))
-	if err != nil {
-		return err
-	}
-	return nil
+	// 將日誌輸出到檔案
+	logger.Println("log message")
 }
