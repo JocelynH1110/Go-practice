@@ -83,3 +83,13 @@ MariaDB [mysql]> show databases;
 ```
 
 ## 13-2-4 下載 Go 語言的 MySQL 驅動程式
+可以在下列網址找到針對不同資料庫的 Go 語言驅動程式套件：
+```
+https://go.dev/wiki/SQLDrivers
+```
+
+在主控台用 go get 來下載，這和在第八章下載第三方套件的方式一樣：
+```go
+go get -u github.com/go-sql-driver/mysql
+```
+> -u 參數：表示若系統內已有舊版，Go 語言會更新此套件以及它用到的相依套件。
