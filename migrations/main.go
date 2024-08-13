@@ -2,17 +2,19 @@ package main
 
 import (
 	"database/sql"
+	"log"
+	"os"
 
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	db, err := sql.Open("postgres", "postgres://jocelyn:1234@localhost/goose_demo_dev")
+	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	err = db.Ping()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }

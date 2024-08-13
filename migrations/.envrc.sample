@@ -1,0 +1,4 @@
+export DATABASE_URL="postgres://postgres:postgres@localhost/goose_demo_dev?sslmode=disable"
+export GOOSE_DRIVER=postgres
+export GOOSE_DBSTRING="$DATABASE_URL"
+export GOOSE_MIGRATION_DIR=db/migrations
