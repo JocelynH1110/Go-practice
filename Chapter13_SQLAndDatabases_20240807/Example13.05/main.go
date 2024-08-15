@@ -7,7 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type employee struct {
+type employee struct { // 用來紀錄 employee 一筆資料的結構
 	id   int
 	name string
 }
@@ -26,37 +26,18 @@ func main() {
 	}
 	fmt.Println("資料庫連線成功")
 
-	// 插入多筆資料
-	insertStmt, err := db.Prepare("INSERT INTO employee(id,name) VALUE (?,?),(?,?)")
+	// 產生參數化查詢敘述
+	rowStmt, err := db.Prepare("SELECT name FROM employee WHERE id=?")
 	if err != nil {
 		panic(err)
 	}
-	defer insertStmt.Close()
+	defer rowStmt.Close()
 
-	_, err = insertStmt.Exec(306, "Pao", 307, "Ruby")
+	// 用參數化查詢來取出符合的單一一筆資料
+	e := employee{id: 30}
+	err = rowStmt.QueryRow(e.id).Scan(&e.name)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("成功插入資料")
-
-	// 查詢資料表，傳回 sql.Rows
-	rows, err := db.Query("SELECT * FROM employee")
-	if err != nil {
-		panic(err)
-	}
-	defer rows.Close()
-	fmt.Println("資料表查詢成功")
-
-	for rows.Next() { // 走訪 rows
-		e := employee{}
-		err := rows.Scan(&e.id, &e.name) // 讀出一筆資料
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println(e.id, e.name) // 印出資料
-	}
-	err = rows.Err() // 檢查 Rows 有無遭遇其他錯誤
-	if err != nil {
-		panic(err)
-	}
+	fmt.Printf("id = %v 的員工名稱為 %v\n", e.id, e.name)
 }

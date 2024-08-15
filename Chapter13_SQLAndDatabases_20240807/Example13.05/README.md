@@ -96,3 +96,60 @@ MariaDB [mysqldb]> select * from employee;
 > db.Exec() 和 Query() 差別，Query 會傳回 sql.Rows 結構，用來代表查詢結果的一列列資料，如下：
 `func (db *DB) Query(query string, args ...interface{}) (*sql.Rows, error)`
 > 2. 用 for 迴圈 rows.Next() 走訪它，迴圈每執行一次 rows 就會指向下列。此時可用 rows.Scan() 來將該列的欄位賦值給變數（變數數量必須跟欄位相同）
+
+
+## 13-6-2 查詢符合條件的資料
+設下過濾條件的查詢，是另一個有可能遭受 SQL 注入攻擊的時候，故再度使用 db.Prepare() 來產生參數化查詢敘述。
+```go
+package main
+
+import (
+	"database/sql"
+	"fmt"
+
+	_ "github.com/go-sql-driver/mysql"
+)
+
+type employee struct { // 用來紀錄 employee 一筆資料的結構
+	id   int
+	name string
+}
+
+func main() {
+	db, err := sql.Open("mysql", "jocelyn:1234@tcp(localhost:3306)/mysqldb?charset=utf8")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	fmt.Println("sql.DB 結構已建立")
+
+	err = db.Ping()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("資料庫連線成功")
+
+	// 產生參數化查詢敘述
+	rowStmt, err := db.Prepare("SELECT name FROM employee WHERE id=?")
+	if err != nil {
+		panic(err)
+	}
+	defer rowStmt.Close()
+
+	// 用參數化查詢來取出符合的單一一筆資料
+	e := employee{id: 307}
+	err = rowStmt.QueryRow(e.id).Scan(&e.name)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("id = %v 的員工名稱為 %v", e.id, e.name)
+```
+顯示結果：
+```shell
+sql.DB 結構已建立
+資料庫連線成功
+id = 307 的員工名稱為 Ruby
+```
+解析：
+> sql.DB 和 sql.Stmt 結構都有 Query() 和 QueryRow() 方法，差別在於 QueryRow() 只會傳回最多一筆資料（sql.Row 結構，不是 Rows 結構）。當只要尋找特定一筆資料時，這樣就很方便不用在用迴圈走訪。
+> Scan() 如果有兩筆資料一樣，取第一個，其他捨棄。
