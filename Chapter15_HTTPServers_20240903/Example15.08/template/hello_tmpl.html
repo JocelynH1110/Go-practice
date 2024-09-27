@@ -1,0 +1,14 @@
+<html>
+<h1>Customer {{.ID}}</h1>
+{{if .ID}}
+<p>Details:</p>
+<ul>
+  {{if .Name}}<li>Name: {{.Name}}</li>{{end}}
+  {{if .Surname}}<li>Surname: {{.Surname}}</li>{{end}}
+  {{if .Age}}<li>Age: {{.Age}}</li>{{end}}
+</ul>
+{{else}}
+<p>Data not available</p>
+{{end}}
+
+</html>
